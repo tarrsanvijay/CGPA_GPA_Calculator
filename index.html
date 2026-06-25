@@ -536,13 +536,196 @@
     font-size: 13px;
     color: var(--accent2);
   }
+
+  /* ══════════════════════════════
+     TIMETABLE PLANNER
+  ══════════════════════════════ */
+  :root{
+    --tt-theory: #2a2550;
+    --tt-theory-deep: #a78bfa;
+    --tt-lab: #142a3a;
+    --tt-lab-deep: #5fc2e8;
+    --tt-open: #1c1a14;
+  }
+
+  .tt-legend {
+    display: flex; gap: 18px; font-size: 12px; color: var(--muted);
+    padding: 16px 20px 0; flex-wrap: wrap; align-items: center;
+    max-width: 1100px; margin: 0 auto;
+  }
+  .tt-legend span { display: inline-flex; align-items: center; gap: 6px; }
+  .tt-dot { width: 10px; height: 10px; border-radius: 3px; display: inline-block; }
+
+  .tt-table-scroll {
+    overflow-x: auto;
+    margin: 16px auto 0;
+    max-width: 1100px;
+    padding: 0 16px 4px;
+  }
+  table.tt-table {
+    border-collapse: separate;
+    border-spacing: 4px;
+    width: 100%;
+    min-width: 980px;
+    table-layout: fixed;
+    font-family: 'Space Grotesk', sans-serif;
+  }
+  table.tt-table th, table.tt-table td {
+    text-align: center;
+    vertical-align: middle;
+    border-radius: 8px;
+  }
+  .tt-row-label {
+    width: 64px;
+    font-weight: 700;
+    font-size: 11px;
+    letter-spacing: .04em;
+    color: var(--text);
+    background: var(--bg);
+  }
+  .tt-head-theory {
+    background: var(--tt-theory);
+    font-size: 10.5px;
+    font-weight: 600;
+    line-height: 1.35;
+    color: var(--tt-theory-deep);
+    padding: 7px 3px;
+  }
+  .tt-head-lab {
+    background: var(--tt-lab);
+    font-size: 10.5px;
+    font-weight: 600;
+    line-height: 1.35;
+    color: var(--tt-lab-deep);
+    padding: 7px 3px;
+  }
+  .tt-lunch-col {
+    background: var(--bg);
+    width: 22px;
+    font-weight: 700;
+    font-size: 9px;
+    color: var(--muted);
+    letter-spacing: .12em;
+  }
+  .tt-lunch-col span { writing-mode: vertical-rl; text-orientation: mixed; }
+  .tt-day-label {
+    background: var(--bg);
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: 12px;
+    color: var(--text);
+    width: 56px;
+  }
+  td.tt-slot-cell {
+    background: var(--tt-open);
+    height: 66px;
+    padding: 0;
+    position: relative;
+    cursor: pointer;
+    border: 1.5px dashed transparent;
+    transition: border-color .12s ease, background .12s ease;
+  }
+  td.tt-slot-cell.empty:hover { border-color: var(--accent); }
+  td.tt-slot-cell.extramural {
+    cursor: default;
+    color: var(--red);
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 700;
+    font-size: 12px;
+  }
+  .tt-empty-code { font-size: 10px; color: var(--muted); font-weight: 500; letter-spacing: .02em; }
+
+  .tt-cell-split { position: absolute; inset: 0; display: flex; flex-direction: column; border-radius: 8px; overflow: hidden; }
+  .tt-cell-split:not(.dual) { flex-direction: row; }
+  .tt-cell-half {
+    flex: 1; position: relative; display: flex; flex-direction: column;
+    justify-content: center; align-items: center; padding: 3px 4px; min-height: 0;
+  }
+  .tt-cell-split.dual .tt-cell-half:first-child { border-bottom: 1px solid rgba(255,255,255,0.08); }
+  .tt-cell-half.filled { cursor: default; }
+  .tt-cell-half:not(.filled) { cursor: pointer; }
+  .tt-cell-half.half-theory:not(.filled):hover { background: var(--tt-theory); }
+  .tt-cell-half.half-lab:not(.filled):hover { background: var(--tt-lab); }
+  .tt-cell-half .sub-name {
+    font-weight: 700; font-size: 11px; line-height: 1.1; color: #fff;
+    text-align: center; word-break: break-word; max-width: 100%;
+  }
+  .tt-cell-half.filled .sub-combo { font-size: 9px; color: rgba(255,255,255,0.85); letter-spacing: .02em; }
+  .tt-cell-half .tt-remove-x {
+    position: absolute; top: 2px; right: 3px; width: 14px; height: 14px; border-radius: 50%;
+    background: rgba(0,0,0,0.25); color: #fff; font-size: 10px; line-height: 14px;
+    text-align: center; cursor: pointer; opacity: 0; transition: opacity .12s ease, background .12s ease;
+  }
+  .tt-cell-half.filled:hover .tt-remove-x { opacity: 1; }
+  .tt-cell-half .tt-remove-x:hover { background: rgba(0,0,0,0.5); }
+
+  .tt-popover {
+    position: absolute; z-index: 50; top: calc(100% + 6px); left: 50%;
+    transform: translateX(-50%);
+    background: var(--surface2); border: 1.5px solid var(--accent);
+    border-radius: 10px; box-shadow: 0 10px 28px rgba(0,0,0,0.5);
+    padding: 14px; width: 220px; text-align: left; cursor: default;
+    animation: tt-pop-in .12s ease-out;
+    font-family: 'Space Grotesk', sans-serif;
+  }
+  @keyframes tt-pop-in {
+    from { opacity: 0; transform: translateX(-50%) translateY(-4px); }
+    to { opacity: 1; transform: translateX(-50%) translateY(0); }
+  }
+  .tt-popover label {
+    display: block; font-size: 10px; font-weight: 700; text-transform: uppercase;
+    letter-spacing: .06em; color: var(--muted); margin: 8px 0 5px;
+  }
+  .tt-popover label:first-of-type { margin-top: 0; }
+  .tt-combo-options { display: flex; flex-direction: column; gap: 5px; }
+  .tt-combo-opt {
+    font-size: 12px; font-weight: 600; border: 1.5px solid var(--border);
+    border-radius: 6px; padding: 6px 8px; background: var(--bg); color: var(--text);
+    cursor: pointer; text-align: left; transition: border-color .1s ease, background .1s ease;
+    font-family: 'Space Grotesk', sans-serif;
+  }
+  .tt-combo-opt:hover { border-color: var(--accent); background: rgba(108,99,255,0.12); }
+  .tt-combo-opt.selected { border-color: var(--accent); background: var(--accent); color: #fff; }
+  .tt-combo-opt[disabled] { opacity: .4; cursor: not-allowed; text-decoration: line-through; }
+  .tt-popover input[type=text] {
+    width: 100%; font-size: 13px; padding: 7px 8px; border: 1.5px solid var(--border);
+    border-radius: 6px; outline: none; background: var(--bg); color: var(--text);
+    font-family: 'Space Grotesk', sans-serif;
+  }
+  .tt-popover input[type=text]:focus { border-color: var(--accent); }
+  .tt-popover-actions { display: flex; gap: 8px; margin-top: 12px; }
+  .tt-popover-actions .tt-save-btn {
+    flex: 1; padding: 7px 0; font-size: 12.5px; text-align: center;
+    background: var(--accent); color: #fff; border: none; border-radius: 9px;
+    font-weight: 700; cursor: pointer; font-family: inherit;
+  }
+  .tt-popover-actions .tt-save-btn[disabled] { opacity: .5; cursor: not-allowed; }
+  .tt-popover-close {
+    position: absolute; top: 8px; right: 10px; font-size: 14px; color: var(--muted);
+    cursor: pointer; background: none; border: none;
+  }
+
+  .tt-summary {
+    max-width: 1100px; margin: 26px auto 0; padding: 0 16px 60px;
+  }
+  .tt-summary-head {
+    font-family: 'Syne', sans-serif; font-size: 0.9rem; font-weight: 800;
+    color: var(--text); margin-bottom: 10px;
+  }
+  .tt-summary-empty { font-size: 13px; color: var(--muted); }
+  .tt-summary-list { display: flex; flex-wrap: wrap; gap: 8px; }
+  .tt-summary-chip {
+    display: flex; align-items: center; gap: 8px; border-radius: 8px;
+    padding: 7px 11px; font-size: 12.5px; color: #fff; font-weight: 600;
+  }
+  .tt-summary-chip .combo { font-size: 11px; opacity: .85; font-weight: 500; }
 </style>
 </head>
 <body>
 
 <header>
-  <h1>GPA &amp; CGPA Calculator</h1>
-  <p>Simple · Accurate · Instant</p>
+  <h1>Student Toolkit</h1>
+  <p>GPA · CGPA · FFCS Timetable</p>
 </header>
 
 <!-- ── HOME: MODE PICKER ── -->
@@ -557,6 +740,11 @@
       <div class="icon">🎓</div>
       <div class="title">CGPA Calculator</div>
       <div class="desc">Calculate CGPA across<br>multiple semesters</div>
+    </button>
+    <button class="mode-btn" onclick="showMode('timetable')">
+      <div class="icon">🗓️</div>
+      <div class="title">Timetable Planner</div>
+      <div class="desc">Plan your FFCS<br>slot registrations</div>
     </button>
   </div>
 
@@ -636,6 +824,30 @@
   </div>
 </div>
 
+<!-- ── TIMETABLE VIEW ── -->
+<div class="calc-view" id="view-timetable">
+  <div class="top-bar">
+    <button class="back-btn" onclick="goHome()">← Back</button>
+    <span class="top-bar-title">Timetable Planner</span>
+  </div>
+  <div class="tt-legend">
+    <span><span class="tt-dot" style="background:var(--tt-theory)"></span>Theory hours</span>
+    <span><span class="tt-dot" style="background:var(--tt-lab)"></span>Lab hours</span>
+    <span><span class="tt-dot" style="background:var(--tt-open)"></span>Open slot</span>
+    <span><span class="tt-dot" style="background:var(--accent)"></span>Registered course</span>
+  </div>
+  <div class="tt-table-scroll">
+    <table class="tt-table" id="ttTable"></table>
+  </div>
+  <div class="tt-summary">
+    <div class="tt-summary-head">Registered courses</div>
+    <div id="ttSummaryBox"><div class="tt-summary-empty">No courses registered yet — click a slot above to begin.</div></div>
+    <div class="center-row" style="margin-top:14px;">
+      <button class="btn-rem-sem" id="ttClearBtn" style="padding:8px 18px;">Clear all</button>
+    </div>
+  </div>
+</div>
+
 <div id="toast"></div>
 
 <!-- ── CGPA VIEW ── -->
@@ -690,13 +902,16 @@ function showMode(mode) {
   document.getElementById('home').style.display = 'none';
   document.getElementById('view-gpa').classList.remove('active');
   document.getElementById('view-cgpa').classList.remove('active');
+  document.getElementById('view-timetable').classList.remove('active');
   document.getElementById(`view-${mode}`).classList.add('active');
   if (mode === 'cgpa') renderSavedList();
+  if (mode === 'timetable') ttRenderAll();
 }
 function goHome() {
   document.getElementById('home').style.display = '';
   document.getElementById('view-gpa').classList.remove('active');
   document.getElementById('view-cgpa').classList.remove('active');
+  document.getElementById('view-timetable').classList.remove('active');
 }
 
 /* ── TOAST ── */
@@ -862,6 +1077,357 @@ function cgpaRecalc() {
     document.getElementById('cgpa-bar').style.width = `${(cgpa / 10) * 100}%`;
   } else { rc.classList.remove('show'); }
 }
+/* ══════════════════════════════
+   TIMETABLE PLANNER
+   Clock times updated per the latest reference image: theory/lab columns
+   keep the same slot-code grid (A1, L1, TB1...) -- only displayed start/end
+   times changed.
+══════════════════════════════ */
+const ttTheoryHeaders = [
+  "08:00\nto\n08:50","09:00\nto\n09:50","10:00\nto\n10:50",
+  "11:00\nto\n11:50","12:00\nto\n12:50","",
+  "14:00\nto\n14:50","15:00\nto\n15:50","16:00\nto\n16:50",
+  "17:00\nto\n17:50","18:00\nto\n18:50","18:51\nto\n19:00","19:01\nto\n19:50"
+];
+const ttLabHeaders = [
+  "08:00\nto\n08:50","08:51\nto\n09:40","09:51\nto\n10:40",
+  "10:41\nto\n11:30","11:40\nto\n12:30","12:31\nto\n13:20",
+  "14:00\nto\n14:50","14:51\nto\n15:40","15:51\nto\n16:40",
+  "16:41\nto\n17:30","17:40\nto\n18:30","18:31\nto\n19:20",""
+];
+
+const ttDays = [
+  { name:"MON", cells:[
+    {t:"A1", l:"L1"},{t:"F1", l:"L2"},{t:"D1", l:"L3"},{t:"TB1", l:"L4"},{t:"TG1", l:"L5"},{t:null,l:"L6"},
+    {t:"A2", l:"L31"},{t:"F2", l:"L32"},{t:"D2", l:"L33"},{t:"TB2", l:"L34"},{t:"TG2", l:"L35"},{t:null,l:"L36"}
+  ]},
+  { name:"TUE", cells:[
+    {t:"B1", l:"L7"},{t:"G1", l:"L8"},{t:"E1", l:"L9"},{t:"TC1", l:"L10"},{t:"TAA1", l:"L11"},{t:null,l:"L12"},
+    {t:"B2", l:"L37"},{t:"G2", l:"L38"},{t:"E2", l:"L39"},{t:"TC2", l:"L40"},{t:"TAA2", l:"L41"},{t:null,l:"L42"}
+  ]},
+  { name:"WED", cells:[
+    {t:"C1", l:"L13"},{t:"A1", l:"L14"},{t:"F1", l:"L15"},{t:"TD1", l:"L16"},{extramural:true},{},
+    {t:"C2", l:"L43"},{t:"A2", l:"L44"},{t:"F2", l:"L45"},{t:"TD2", l:"L46"},{t:"TBB2", l:"L47"},{t:null,l:"L48"}
+  ]},
+  { name:"THU", cells:[
+    {t:"D1", l:"L19"},{t:"B1", l:"L20"},{t:"G1", l:"L21"},{t:"TE1", l:"L22"},{t:"TCC1", l:"L23"},{t:null,l:"L24"},
+    {t:"D2", l:"L49"},{t:"B2", l:"L50"},{t:"G2", l:"L51"},{t:"TE2", l:"L52"},{t:"TCC2", l:"L53"},{t:null,l:"L54"}
+  ]},
+  { name:"FRI", cells:[
+    {t:"E1", l:"L25"},{t:"C1", l:"L26"},{t:"TA1", l:"L27"},{t:"TF1", l:"L28"},{t:"TDD1", l:"L29"},{t:null,l:"L30"},
+    {t:"E2", l:"L55"},{t:"C2", l:"L56"},{t:"TA2", l:"L57"},{t:"TF2", l:"L58"},{t:"TDD2", l:"L59"},{t:null,l:"L60"}
+  ]}
+];
+
+const TT_DOUBLE_TIER_LETTERS = new Set(["A","C","D"]);
+function ttCompanionCodes(letter){ return { single: "T"+letter, double: "T"+letter+letter }; }
+function ttComboOptionsFor(code){
+  if(!code) return [code];
+  const m = code.match(/^([A-Z])(\d)$/);
+  if(!m) return [code];
+  const letter = m[1], half = m[2];
+  const { single, double } = ttCompanionCodes(letter);
+  const opts = [code, `${code}+${single}${half}`];
+  if(TT_DOUBLE_TIER_LETTERS.has(letter)) opts.push(`${code}+${single}${half}+${double}${half}`);
+  return opts;
+}
+
+const ttTheoryCodeLocations = {};
+ttDays.forEach((day, dIdx) => {
+  day.cells.forEach((cell, cIdx) => {
+    if(cell.t){
+      if(!ttTheoryCodeLocations[cell.t]) ttTheoryCodeLocations[cell.t] = [];
+      ttTheoryCodeLocations[cell.t].push(`${dIdx}-${cIdx}`);
+    }
+  });
+});
+function ttCellsForCombo(combo){
+  const keys = new Set();
+  combo.split('+').forEach(code => (ttTheoryCodeLocations[code] || []).forEach(k => keys.add(k)));
+  return Array.from(keys);
+}
+
+let ttRegistrations = {};
+let ttTheoryOwner = {};
+let ttLabOwner = {};
+let ttNextId = 1;
+const ttPalette = ["#6c63ff","#f5c542","#34d399","#f87171","#a78bfa","#5fc2e8","#ff9f43","#e879c9","#7ee787","#ffb454"];
+let ttColorIdx = 0;
+function ttNextColor(){ const c = ttPalette[ttColorIdx % ttPalette.length]; ttColorIdx++; return c; }
+
+function ttFmtHeader(h){ return h.split('\n').join('<br>'); }
+function ttCellData(dIdx, cIdx){ return ttDays[dIdx].cells[cIdx]; }
+function ttEsc(s){ return s.replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+
+function ttBuildTable(){
+  const table = document.getElementById('ttTable');
+  let html = '';
+  html += '<tr>';
+  html += `<th class="tt-row-label">THEORY<br>HOURS</th>`;
+  for(let i=0;i<5;i++) html += `<th class="tt-head-theory">${ttFmtHeader(ttTheoryHeaders[i])}</th>`;
+  html += `<td class="tt-lunch-col" rowspan="7"><span>LUNCH</span></td>`;
+  for(let i=6;i<13;i++) html += `<th class="tt-head-theory">${ttFmtHeader(ttTheoryHeaders[i])}</th>`;
+  html += '</tr>';
+
+  html += '<tr>';
+  html += `<th class="tt-row-label">LAB<br>HOURS</th>`;
+  for(let i=0;i<6;i++) html += `<th class="tt-head-lab">${ttFmtHeader(ttLabHeaders[i])}</th>`;
+  for(let i=6;i<12;i++) html += `<th class="tt-head-lab">${ttFmtHeader(ttLabHeaders[i])}</th>`;
+  html += '</tr>';
+
+  ttDays.forEach((day, dIdx) => {
+    html += '<tr>';
+    html += `<td class="tt-day-label">${day.name}</td>`;
+    day.cells.forEach((cell, cIdx) => {
+      if(cell.extramural){
+        html += `<td class="tt-slot-cell extramural">Extramural</td>`;
+        return;
+      }
+      html += `<td class="tt-slot-cell empty" data-day="${dIdx}" data-col="${cIdx}"></td>`;
+    });
+    html += '</tr>';
+  });
+  table.innerHTML = html;
+}
+
+function ttRenderAll(){
+  if(!document.getElementById('ttTable').innerHTML.trim()) ttBuildTable();
+  document.querySelectorAll('.tt-slot-cell:not(.extramural)').forEach(td => {
+    const dIdx = +td.dataset.day, cIdx = +td.dataset.col;
+    const data = ttCellData(dIdx, cIdx);
+    const key = `${dIdx}-${cIdx}`;
+    const theoryId = data.t ? ttTheoryOwner[key] : null;
+    const labId = data.l ? ttLabOwner[key] : null;
+    const theoryReg = theoryId ? ttRegistrations[theoryId] : null;
+    const labReg = labId ? ttRegistrations[labId] : null;
+
+    td.innerHTML = '';
+    const bothPresent = !!data.t && !!data.l;
+    const anyFilled = !!theoryReg || !!labReg;
+    td.classList.toggle('empty', !anyFilled);
+    if(!data.t && !data.l) return;
+
+    const wrap = document.createElement('div');
+    wrap.className = 'tt-cell-split';
+    if(bothPresent) wrap.classList.add('dual');
+
+    if(data.t){
+      const h = ttBuildHalf(theoryReg, data.t, theoryId, bothPresent);
+      h.classList.add('half-theory');
+      wrap.appendChild(h);
+    }
+    if(data.l){
+      const h = ttBuildHalf(labReg, data.l, labId, bothPresent);
+      h.classList.add('half-lab');
+      wrap.appendChild(h);
+    }
+    td.appendChild(wrap);
+  });
+  ttRenderSummary();
+}
+
+function ttBuildHalf(reg, code, ownerId, isDual){
+  const half = document.createElement('div');
+  half.className = 'tt-cell-half' + (isDual ? '' : ' solo');
+  if(reg){
+    half.classList.add('filled');
+    half.style.background = reg.color;
+    half.innerHTML = `
+      <div class="tt-remove-x" data-removeid="${ownerId}">&times;</div>
+      <div class="sub-name">${ttEsc(reg.subject)}</div>
+      <div class="sub-combo">${reg.comboLabel}</div>
+    `;
+  } else {
+    half.innerHTML = `<div class="tt-empty-code">${code}</div>`;
+  }
+  return half;
+}
+
+let ttActivePopover = null;
+function ttClosePopover(){ if(ttActivePopover){ ttActivePopover.remove(); ttActivePopover = null; } }
+
+document.addEventListener('click', (e) => {
+  if(ttActivePopover && !ttActivePopover.contains(e.target) && !e.target.closest('.tt-slot-cell.empty')){
+    ttClosePopover();
+  }
+});
+
+document.getElementById('ttTable').addEventListener('click', (e) => {
+  const removeBtn = e.target.closest('.tt-remove-x');
+  if(removeBtn){ ttRemoveCourse(removeBtn.dataset.removeid); return; }
+  if(e.target.closest('.tt-cell-half.filled')) return;
+
+  const cell = e.target.closest('.tt-slot-cell');
+  if(!cell || cell.classList.contains('extramural')) return;
+
+  const dIdx = +cell.dataset.day, cIdx = +cell.dataset.col;
+  const data = ttCellData(dIdx, cIdx);
+  const key = `${dIdx}-${cIdx}`;
+  const theoryOpen = data.t && !ttTheoryOwner[key];
+  const labOpen = data.l && !ttLabOwner[key];
+  if(!theoryOpen && !labOpen) return;
+
+  ttClosePopover();
+
+  const half = e.target.closest('.tt-cell-half');
+  const halves = cell.querySelectorAll('.tt-cell-half');
+  let clickedType = null;
+  if(half && halves.length === 2) clickedType = (half === halves[0]) ? 'theory' : 'lab';
+
+  if(clickedType === 'theory' && theoryOpen) ttOpenPopover(cell, dIdx, cIdx, 'theory');
+  else if(clickedType === 'lab' && labOpen) ttOpenPopover(cell, dIdx, cIdx, 'lab');
+  else if(theoryOpen && labOpen) ttOpenPopover(cell, dIdx, cIdx);
+  else if(theoryOpen) ttOpenPopover(cell, dIdx, cIdx, 'theory');
+  else if(labOpen) ttOpenPopover(cell, dIdx, cIdx, 'lab');
+  e.stopPropagation();
+});
+
+function ttOpenPopover(cell, dIdx, cIdx, forceType){
+  const data = ttCellData(dIdx, cIdx);
+  const hasTheory = !!data.t, hasLab = !!data.l;
+  const pop = document.createElement('div');
+  pop.className = 'tt-popover';
+
+  if(hasTheory && hasLab && !forceType){
+    pop.innerHTML = `
+      <button class="tt-popover-close">&times;</button>
+      <label>What are you booking?</label>
+      <div class="tt-combo-options">
+        <button class="tt-type-opt" data-type="theory">${data.t} <span style="opacity:.6">· theory</span></button>
+        <button class="tt-type-opt" data-type="lab">${data.l} <span style="opacity:.6">· lab</span></button>
+      </div>
+    `;
+    cell.appendChild(pop);
+    ttActivePopover = pop;
+    pop.querySelector('.tt-popover-close').addEventListener('click', e=>{ e.stopPropagation(); ttClosePopover(); });
+    pop.querySelectorAll('.tt-type-opt').forEach(btn => {
+      btn.addEventListener('click', e => { e.stopPropagation(); ttClosePopover(); ttOpenPopover(cell, dIdx, cIdx, btn.dataset.type); });
+    });
+    return;
+  }
+
+  const isLab = forceType === 'lab' || (!hasTheory && hasLab);
+
+  if(isLab){
+    const nextCell = ttDays[dIdx].cells[cIdx+1];
+    const nextKey = `${dIdx}-${cIdx+1}`;
+    const canDouble = nextCell && nextCell.l && !nextCell.extramural && !ttLabOwner[nextKey];
+    const labNum = data.l, nextLabNum = canDouble ? nextCell.l : null;
+    pop.innerHTML = `
+      <button class="tt-popover-close">&times;</button>
+      <label>Lab duration</label>
+      <div class="tt-combo-options">
+        <button class="tt-combo-opt selected" data-combo="${labNum}">${labNum} <span style="opacity:.6">· single block</span></button>
+        ${canDouble ? `<button class="tt-combo-opt" data-combo="${labNum}+${nextLabNum}">${labNum}+${nextLabNum} <span style="opacity:.6">· double block</span></button>` : ''}
+      </div>
+      <label>Subject name</label>
+      <input type="text" id="ttSubjInput" placeholder="e.g. Data Structures Lab" maxlength="40">
+      <div class="tt-popover-actions"><button class="tt-save-btn" id="ttSaveBtn">Save</button></div>
+    `;
+  } else {
+    const combos = ttComboOptionsFor(data.t);
+    const blockedFlags = combos.map(c => ttCellsForCombo(c).some(k => ttTheoryOwner[k]));
+    const firstOkIdx = blockedFlags.indexOf(false);
+    pop.innerHTML = `
+      <button class="tt-popover-close">&times;</button>
+      <label>Slot combination</label>
+      <div class="tt-combo-options">
+        ${combos.map((c,i)=>{
+          const blocked = blockedFlags[i];
+          return `<button class="tt-combo-opt ${i===firstOkIdx?'selected':''}" ${blocked?'disabled':''} data-combo="${c}">${c}${blocked?' <span style="opacity:.6">· conflicts</span>':''}</button>`;
+        }).join('')}
+      </div>
+      <label>Subject name</label>
+      <input type="text" id="ttSubjInput" placeholder="e.g. Engineering Physics" maxlength="40">
+      <div class="tt-popover-actions"><button class="tt-save-btn" id="ttSaveBtn">Save</button></div>
+    `;
+  }
+
+  cell.appendChild(pop);
+  ttActivePopover = pop;
+
+  const selectedEl = pop.querySelector('.tt-combo-opt.selected');
+  let selectedCombo = selectedEl ? selectedEl.dataset.combo : null;
+  const saveBtn = pop.querySelector('#ttSaveBtn');
+  if(!selectedCombo && saveBtn){ saveBtn.disabled = true; saveBtn.textContent = 'All options conflict'; }
+
+  pop.querySelectorAll('.tt-combo-opt:not([disabled])').forEach(btn => {
+    btn.addEventListener('click', e => {
+      e.stopPropagation();
+      pop.querySelectorAll('.tt-combo-opt').forEach(b=>b.classList.remove('selected'));
+      btn.classList.add('selected');
+      selectedCombo = btn.dataset.combo;
+      if(saveBtn){ saveBtn.disabled = false; saveBtn.textContent = 'Save'; }
+    });
+  });
+
+  pop.querySelector('.tt-popover-close').addEventListener('click', e=>{ e.stopPropagation(); ttClosePopover(); });
+
+  const input = pop.querySelector('#ttSubjInput');
+  input.addEventListener('click', e=>e.stopPropagation());
+  input.focus();
+  input.addEventListener('keydown', e=>{ if(e.key === 'Enter') pop.querySelector('#ttSaveBtn').click(); });
+
+  pop.querySelector('#ttSaveBtn').addEventListener('click', e => {
+    e.stopPropagation();
+    if(!selectedCombo) return;
+    const subject = input.value.trim();
+    if(!subject){ input.style.borderColor = 'var(--red)'; input.placeholder = 'Enter a subject name'; return; }
+    ttRegisterCourse(dIdx, cIdx, isLab, selectedCombo, subject);
+    ttClosePopover();
+  });
+}
+
+function ttRegisterCourse(dIdx, cIdx, isLab, combo, subject){
+  const id = 'ttcourse' + (ttNextId++);
+  const color = ttNextColor();
+  const slotKeys = [];
+  if(isLab){
+    const labCodes = combo.split('+');
+    slotKeys.push(`${dIdx}-${cIdx}`);
+    if(labCodes.length === 2) slotKeys.push(`${dIdx}-${cIdx+1}`);
+    ttRegistrations[id] = { subject, comboLabel: combo, color, slots: slotKeys, type:'lab' };
+    slotKeys.forEach(k => ttLabOwner[k] = id);
+  } else {
+    slotKeys.push(...ttCellsForCombo(combo));
+    ttRegistrations[id] = { subject, comboLabel: combo, color, slots: slotKeys, type:'theory' };
+    slotKeys.forEach(k => ttTheoryOwner[k] = id);
+  }
+  ttRenderAll();
+  showToast(`✓ "${subject}" added to timetable`);
+}
+
+function ttRemoveCourse(id){
+  const reg = ttRegistrations[id];
+  if(!reg) return;
+  const ownerMap = reg.type === 'lab' ? ttLabOwner : ttTheoryOwner;
+  reg.slots.forEach(k => delete ownerMap[k]);
+  delete ttRegistrations[id];
+  ttRenderAll();
+}
+
+function ttRenderSummary(){
+  const box = document.getElementById('ttSummaryBox');
+  const ids = Object.keys(ttRegistrations);
+  if(ids.length === 0){
+    box.innerHTML = '<div class="tt-summary-empty">No courses registered yet — click a slot above to begin.</div>';
+    return;
+  }
+  box.innerHTML = `<div class="tt-summary-list">${ids.map(id => {
+    const r = ttRegistrations[id];
+    return `<div class="tt-summary-chip" style="background:${r.color}">${ttEsc(r.subject)} <span class="combo">${r.comboLabel}</span></div>`;
+  }).join('')}</div>`;
+}
+
+document.getElementById('ttClearBtn').addEventListener('click', () => {
+  if(Object.keys(ttRegistrations).length === 0) return;
+  if(confirm('Clear every registered course from the timetable?')){
+    ttRegistrations = {}; ttTheoryOwner = {}; ttLabOwner = {};
+    ttRenderAll();
+  }
+});
+
+ttBuildTable();
 </script>
 </body>
 </html>
