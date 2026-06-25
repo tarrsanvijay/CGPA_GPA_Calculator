@@ -314,6 +314,140 @@
     .mode-btn .title { font-size: 1rem; }
   }
 
+  /* ── SAVE SEMESTER SECTION ── */
+  .save-sem-section {
+    margin-top: 14px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
+    display: none;
+  }
+  .save-sem-section.show { display: block; }
+  .save-sem-head {
+    padding: 12px 16px;
+    background: var(--surface2);
+    border-bottom: 1px solid var(--border);
+    font-family: 'Syne', sans-serif;
+    font-size: 0.85rem;
+    font-weight: 800;
+    color: var(--text);
+  }
+  .save-sem-body {
+    padding: 14px 16px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+  .save-sem-body label { font-size: 12px; color: var(--muted); white-space: nowrap; }
+  .inp-sem-name {
+    flex: 1;
+    min-width: 160px;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    color: var(--text);
+    font-family: inherit;
+    font-size: 14px;
+    padding: 7px 12px;
+    outline: none;
+    transition: border-color 0.15s;
+  }
+  .inp-sem-name:focus { border-color: var(--accent); }
+  .btn-save-sem {
+    background: var(--green);
+    color: #0a1a12;
+    border: none;
+    border-radius: 9px;
+    padding: 8px 18px;
+    font-size: 13px;
+    font-family: inherit;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.15s;
+    white-space: nowrap;
+  }
+  .btn-save-sem:hover { background: #2ebd88; transform: translateY(-1px); }
+
+  /* ── SAVED SEMESTERS PANEL (CGPA) ── */
+  .saved-panel {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    margin-bottom: 20px;
+    overflow: hidden;
+  }
+  .saved-panel-head {
+    padding: 12px 16px;
+    background: var(--surface2);
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+  .saved-panel-head .sph-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 0.9rem;
+    font-weight: 800;
+    color: var(--text);
+  }
+  .saved-panel-head .sph-hint {
+    font-size: 11px;
+    color: var(--muted);
+  }
+  .saved-empty {
+    padding: 28px;
+    text-align: center;
+    color: var(--muted);
+    font-size: 13px;
+    line-height: 1.7;
+  }
+  .saved-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--border);
+    gap: 10px;
+    flex-wrap: wrap;
+    transition: background 0.1s;
+  }
+  .saved-item:last-child { border-bottom: none; }
+  .saved-item:hover { background: var(--surface2); }
+  .saved-item-left { display: flex; align-items: center; gap: 10px; }
+  .saved-item-left input[type=checkbox] { width: 16px; height: 16px; accent-color: var(--accent); cursor: pointer; }
+  .saved-item-name { font-weight: 600; font-size: 14px; }
+  .saved-item-meta { font-size: 12px; color: var(--muted); margin-top: 2px; }
+  .saved-item-right { display: flex; align-items: center; gap: 10px; }
+  .saved-item-gpa {
+    font-family: 'Syne', sans-serif;
+    font-size: 1.1rem;
+    font-weight: 800;
+    color: var(--accent2);
+  }
+  .saved-item-gpa span { font-size: 10px; color: var(--muted); font-family: 'Space Grotesk', sans-serif; font-weight: 400; }
+  .btn-del-saved {
+    background: none; border: none; color: var(--muted);
+    cursor: pointer; font-size: 15px; padding: 3px 7px;
+    border-radius: 6px; transition: color 0.15s;
+  }
+  .btn-del-saved:hover { color: var(--red); }
+
+  /* ── TOAST ── */
+  #toast {
+    position: fixed; bottom: 28px; left: 50%;
+    transform: translateX(-50%) translateY(20px);
+    background: var(--green); color: #0a1a12;
+    font-weight: 700; font-size: 13px;
+    padding: 10px 22px; border-radius: 100px;
+    opacity: 0; transition: all 0.3s;
+    pointer-events: none; z-index: 999; white-space: nowrap;
+  }
+  #toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
   /* ── GRADING GUIDE ── */
   .guide {
     max-width: 660px;
@@ -489,8 +623,20 @@
       <div class="rv" id="gpa-rv">–</div>
       <div class="bar-wrap"><div class="bar-fill" id="gpa-bar" style="width:0%"></div></div>
     </div>
+
+    <!-- SAVE AS SEMESTER -->
+    <div class="save-sem-section" id="save-sem-section">
+      <div class="save-sem-head">💾 Save this semester for CGPA calculation</div>
+      <div class="save-sem-body">
+        <label>Semester Name</label>
+        <input class="inp-sem-name" id="inp-sem-name" type="text" placeholder="e.g. Semester 1 / 2nd Year Odd" />
+        <button class="btn-save-sem" onclick="saveSemester()">Save</button>
+      </div>
+    </div>
   </div>
 </div>
+
+<div id="toast"></div>
 
 <!-- ── CGPA VIEW ── -->
 <div class="calc-view" id="view-cgpa">
@@ -511,13 +657,18 @@
     <div class="divv"></div>
     <div class="stat">
       <div class="val green" id="c-sems">0</div>
-      <div class="lbl">Semesters</div>
+      <div class="lbl">Selected</div>
     </div>
   </div>
   <div class="container">
-    <div id="sem-list"></div>
-    <div class="center-row">
-      <button class="btn-add-sem" onclick="addSemester()">＋ Add Semester</button>
+    <div class="saved-panel">
+      <div class="saved-panel-head">
+        <span class="sph-title">Saved Semesters</span>
+        <span class="sph-hint">✓ Check semesters to include in CGPA</span>
+      </div>
+      <div id="saved-list">
+        <div class="saved-empty">No saved semesters yet.<br>Use <b>GPA Calculator</b> to enter and save a semester.</div>
+      </div>
     </div>
     <div class="result-card" id="cgpa-result">
       <div class="rl">Cumulative Grade Point Average</div>
@@ -531,12 +682,16 @@
 const GP = { S:10, A:9, B:8, C:7, D:6, E:5, F:0 };
 const GRADE_OPTS = `<option value="" disabled selected>–</option>` + Object.keys(GP).map(g => `<option value="${g}">${g}</option>`).join('');
 
+function fmt(n) { return n % 1 === 0 ? String(n) : n.toFixed(2); }
+function escHtml(s) { return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
 /* ── NAVIGATION ── */
 function showMode(mode) {
   document.getElementById('home').style.display = 'none';
   document.getElementById('view-gpa').classList.remove('active');
   document.getElementById('view-cgpa').classList.remove('active');
   document.getElementById(`view-${mode}`).classList.add('active');
+  if (mode === 'cgpa') renderSavedList();
 }
 function goHome() {
   document.getElementById('home').style.display = '';
@@ -544,18 +699,22 @@ function goHome() {
   document.getElementById('view-cgpa').classList.remove('active');
 }
 
+/* ── TOAST ── */
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2400);
+}
+
 /* ══════════════════════════════
-   GPA CALCULATOR (single semester)
+   GPA CALCULATOR
 ══════════════════════════════ */
-let gpaRows = [];
-let gpaRowCount = 0;
+let gpaRows = [], gpaRowCount = 0;
 
 function gpaAddRow() {
   gpaRowCount++;
-  const rid = gpaRowCount;
-  const idx = gpaRows.length + 1;
+  const rid = gpaRowCount, idx = gpaRows.length + 1;
   gpaRows.push({ rid, credits: '', grade: '' });
-
   const tr = document.createElement('tr');
   tr.id = `gr-${rid}`;
   tr.innerHTML = `
@@ -571,8 +730,7 @@ function gpaAddRow() {
 }
 
 function gpaUpd(rid, field, val) {
-  const s = gpaRows.find(x => x.rid === rid);
-  if (!s) return;
+  const s = gpaRows.find(x => x.rid === rid); if (!s) return;
   s[field] = field === 'credits' ? (val === '' ? '' : parseFloat(val)) : val;
   gpaRecalc();
 }
@@ -590,169 +748,120 @@ function gpaRecalc() {
   let pts = 0, creds = 0, hasData = false;
   gpaRows.forEach(s => {
     const c = (s.credits === '' || isNaN(s.credits)) ? 0 : s.credits;
-    const p = (GP[s.grade] ?? 0) * c;
+    const p = s.grade ? (GP[s.grade] ?? 0) * c : 0;
     const el = document.getElementById(`gp-${s.rid}`);
-    if (el) el.textContent = c > 0 ? p.toFixed(2) : '–';
+    if (el) el.textContent = (c > 0 && s.grade) ? fmt(p) : '–';
     pts += p; creds += c;
-    if (c > 0) hasData = true;
+    if (c > 0 && s.grade) hasData = true;
   });
 
   const gpa = (creds > 0 && hasData) ? pts / creds : null;
   const gpaStr = gpa !== null ? gpa.toFixed(2) : '–';
 
   document.getElementById('g-gpa').textContent     = gpaStr;
-  document.getElementById('g-credits').textContent = creds % 1 === 0 ? creds : creds.toFixed(2);
-  document.getElementById('g-pts').textContent     = pts % 1 === 0 ? pts : pts.toFixed(2);
+  document.getElementById('g-credits').textContent = fmt(creds);
+  document.getElementById('g-pts').textContent     = fmt(pts);
 
   const info = document.getElementById('gpa-info');
   info.innerHTML = gpaRows.length === 0
     ? 'No subjects yet.'
-    : `<b>${gpaRows.length}</b> subject${gpaRows.length !== 1 ? 's' : ''} &nbsp;·&nbsp; <b>${creds % 1 === 0 ? creds : creds.toFixed(2)}</b> credits &nbsp;·&nbsp; <b>${pts % 1 === 0 ? pts : pts.toFixed(2)}</b> points`;
+    : `<b>${gpaRows.length}</b> subject${gpaRows.length !== 1 ? 's' : ''} &nbsp;·&nbsp; <b>${fmt(creds)}</b> credits &nbsp;·&nbsp; <b>${fmt(pts)}</b> points`;
 
   const rc = document.getElementById('gpa-result');
+  const ss = document.getElementById('save-sem-section');
   if (gpa !== null) {
     rc.classList.add('show');
     document.getElementById('gpa-rv').textContent = gpaStr;
     document.getElementById('gpa-bar').style.width = `${(gpa / 10) * 100}%`;
-  } else { rc.classList.remove('show'); }
+    ss.classList.add('show');
+  } else {
+    rc.classList.remove('show');
+    ss.classList.remove('show');
+  }
 }
 
 /* ══════════════════════════════
-   CGPA CALCULATOR (multi semester)
+   SAVE SEMESTER
 ══════════════════════════════ */
-let semCount = 0, rowCount = 0;
-const semesters = {};
+const savedSemesters = [];
+let savedIdCtr = 0;
 
-function addSemester() {
-  semCount++;
-  const sid = semCount;
-  semesters[sid] = [];
+function saveSemester() {
+  const name = document.getElementById('inp-sem-name').value.trim();
+  if (!name) { alert('Please enter a semester name.'); return; }
 
-  const card = document.createElement('div');
-  card.className = 'semester-card';
-  card.id = `sc-${sid}`;
-  card.innerHTML = `
-    <div class="sem-head">
-      <div class="sem-title">Semester ${sid}</div>
-      <div class="sem-gpa-pill">
-        <span class="gv" id="sg-${sid}">–</span>
-        <span class="gl">GPA</span>
-      </div>
-      <button class="btn-rem-sem" onclick="removeSem(${sid})">✕ Remove</button>
-    </div>
-    <div class="tbl-wrap">
-      <table>
-        <thead>
-          <tr>
-            <th>#</th><th>Credits</th><th>Grade</th>
-            <th style="text-align:center">Points</th><th></th>
-          </tr>
-        </thead>
-        <tbody id="tb-${sid}"></tbody>
-      </table>
-    </div>
-    <div class="sem-foot">
-      <div class="sem-info" id="si-${sid}">No subjects yet.</div>
-      <button class="btn-add-sub" onclick="addRow(${sid})">＋ Add Subject</button>
-    </div>
-  `;
-  document.getElementById('sem-list').appendChild(card);
-  cgpaRecalc();
-}
-
-function addRow(sid) {
-  rowCount++;
-  const rid = rowCount;
-  const idx = semesters[sid].length + 1;
-  semesters[sid].push({ rid, credits: '', grade: '' });
-
-  const tr = document.createElement('tr');
-  tr.id = `r-${rid}`;
-  tr.innerHTML = `
-    <td style="color:var(--muted);font-size:13px;text-align:center;width:30px">${idx}</td>
-    <td><input class="inp inp-credits" type="number" min="0" step="0.5" placeholder="e.g. 3"
-        oninput="upd(${sid},${rid},'credits',this.value)" /></td>
-    <td><select class="inp inp-grade" onchange="upd(${sid},${rid},'grade',this.value)">${GRADE_OPTS}</select></td>
-    <td class="pts-cell" id="p-${rid}">–</td>
-    <td><button class="btn-del" onclick="delRow(${sid},${rid})">✕</button></td>
-  `;
-  document.getElementById(`tb-${sid}`).appendChild(tr);
-  recalcSem(sid);
-}
-
-function upd(sid, rid, field, val) {
-  const s = semesters[sid].find(x => x.rid === rid);
-  if (!s) return;
-  s[field] = field === 'credits' ? (val === '' ? '' : parseFloat(val)) : val;
-  recalcSem(sid);
-}
-
-function delRow(sid, rid) {
-  semesters[sid] = semesters[sid].filter(x => x.rid !== rid);
-  document.getElementById(`r-${rid}`)?.remove();
-  document.querySelectorAll(`#tb-${sid} tr`).forEach((r, i) => {
-    const c = r.querySelector('td'); if (c) c.textContent = i + 1;
-  });
-  recalcSem(sid);
-}
-
-function removeSem(sid) {
-  delete semesters[sid];
-  document.getElementById(`sc-${sid}`)?.remove();
-  cgpaRecalc();
-}
-
-function fmt(n) { return n % 1 === 0 ? n : parseFloat(n.toFixed(4)); }
-
-function recalcSem(sid) {
-  const rows = semesters[sid];
-  let pts = 0, creds = 0;
-  rows.forEach(s => {
+  let pts = 0, creds = 0, hasData = false;
+  gpaRows.forEach(s => {
     const c = (s.credits === '' || isNaN(s.credits)) ? 0 : s.credits;
-    const p = (GP[s.grade] ?? 0) * c;
+    const p = s.grade ? (GP[s.grade] ?? 0) * c : 0;
     pts += p; creds += c;
-    const el = document.getElementById(`p-${s.rid}`);
-    if (el) el.textContent = c > 0 ? fmt(p) : '–';
+    if (c > 0 && s.grade) hasData = true;
   });
-  const gpa = creds > 0 ? pts / creds : null;
-  const gpaEl = document.getElementById(`sg-${sid}`);
-  if (gpaEl) gpaEl.textContent = gpa !== null ? gpa.toFixed(2) : '–';
+  if (!hasData || creds === 0) { alert('Please add at least one subject with credits and a grade.'); return; }
 
-  const si = document.getElementById(`si-${sid}`);
-  if (si) {
-    si.innerHTML = rows.length === 0
-      ? 'No subjects yet.'
-      : `<b>${rows.length}</b> subject${rows.length !== 1 ? 's' : ''} &nbsp;·&nbsp; <b>${fmt(creds)}</b> credits &nbsp;·&nbsp; <b>${fmt(pts)}</b> points`;
+  const gpa = pts / creds;
+  savedIdCtr++;
+  savedSemesters.push({ id: savedIdCtr, name, gpa, pts, creds });
+
+  // Clear GPA calculator for next semester
+  gpaRows = []; gpaRowCount = 0;
+  document.getElementById('gpa-tbody').innerHTML = '';
+  document.getElementById('inp-sem-name').value = '';
+  gpaRecalc();
+
+  showToast(`✓ "${name}" saved!`);
+}
+
+/* ══════════════════════════════
+   CGPA — SAVED LIST
+══════════════════════════════ */
+function renderSavedList() {
+  const list = document.getElementById('saved-list');
+  if (savedSemesters.length === 0) {
+    list.innerHTML = '<div class="saved-empty">No saved semesters yet.<br>Use <b>GPA Calculator</b> to enter and save a semester.</div>';
+    cgpaRecalc(); return;
   }
+  list.innerHTML = savedSemesters.map(s => `
+    <div class="saved-item">
+      <div class="saved-item-left">
+        <input type="checkbox" id="chk-${s.id}" checked onchange="cgpaRecalc()" />
+        <div>
+          <div class="saved-item-name">${escHtml(s.name)}</div>
+          <div class="saved-item-meta">${fmt(s.creds)} credits &nbsp;·&nbsp; ${fmt(s.pts)} points</div>
+        </div>
+      </div>
+      <div class="saved-item-right">
+        <div class="saved-item-gpa">${s.gpa.toFixed(2)} <span>GPA</span></div>
+        <button class="btn-del-saved" onclick="deleteSaved(${s.id})" title="Delete">✕</button>
+      </div>
+    </div>
+  `).join('');
   cgpaRecalc();
+}
+
+function deleteSaved(id) {
+  const idx = savedSemesters.findIndex(s => s.id === id);
+  if (idx > -1) savedSemesters.splice(idx, 1);
+  renderSavedList();
 }
 
 function cgpaRecalc() {
-  let totalPts = 0, totalCreds = 0, semNum = Object.keys(semesters).length;
-  Object.keys(semesters).forEach(sid => {
-    semesters[sid].forEach(s => {
-      const c = (s.credits === '' || isNaN(s.credits)) ? 0 : s.credits;
-      totalPts   += (GP[s.grade] ?? 0) * c;
-      totalCreds += c;
-    });
+  let totalPts = 0, totalCreds = 0, selected = 0;
+  savedSemesters.forEach(s => {
+    const chk = document.getElementById(`chk-${s.id}`);
+    if (chk && chk.checked) { totalPts += s.pts; totalCreds += s.creds; selected++; }
   });
-
   const cgpa = totalCreds > 0 ? totalPts / totalCreds : null;
-  const cgpaStr = cgpa !== null ? cgpa.toFixed(2) : '–';
-
-  document.getElementById('c-cgpa').textContent    = cgpaStr;
+  document.getElementById('c-cgpa').textContent    = cgpa !== null ? cgpa.toFixed(2) : '–';
   document.getElementById('c-credits').textContent = fmt(totalCreds);
-  document.getElementById('c-sems').textContent    = semNum;
-
+  document.getElementById('c-sems').textContent    = selected;
   const rc = document.getElementById('cgpa-result');
   if (cgpa !== null) {
     rc.classList.add('show');
-    document.getElementById('cgpa-rv').textContent = cgpaStr;
+    document.getElementById('cgpa-rv').textContent = cgpa.toFixed(2);
     document.getElementById('cgpa-bar').style.width = `${(cgpa / 10) * 100}%`;
   } else { rc.classList.remove('show'); }
 }
-
-/* ── END ── */
 </script>
 </body>
 </html>
